@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CPALE Explained</title>
+    <meta name="description" content="Your CPALE study dashboard">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#7C3AED',
+                        secondary: '#10B981',
+                        accent: '#F472B6',
+                        lavender: '#FDF4FF',
+                    },
+                    fontFamily: {
+                        heading: ['Space Grotesk', 'sans-serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #7C3AED 0%, #F472B6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-glow {
+            transition: all 0.3s ease;
+        }
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+        }
+
+        .subject-card {
+            transition: all 0.3s ease;
+        }
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .animate-scaleIn {
+            animation: scaleIn 0.4s ease forwards;
+        }
+
+        .animate-slideInRight {
+            animation: slideInRight 0.5s ease forwards;
+        }
+
+        .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+        .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+        .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+        .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+
+        /* Pulse animation for CTA */
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s ease-in-out infinite;
+        }
+
+        /* Loading skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-lavender via-white to-green-50 min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="glass sticky top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/landing-page/dashboard.html" class="flex items-center">
+                    <img src="/landing-page/logos/logo-concept-1.svg" alt="CPALE Explained" class="h-10">
+                </a>
+
+                <div class="flex items-center gap-6">
+                    <a href="/landing-page/quiz.html" class="text-gray-600 hover:text-primary font-medium transition-colors">Practice</a>
+                    <a href="/landing-page/dashboard.html" class="text-primary font-medium">Dashboard</a>
+                    <div class="relative group">
+                        <button class="flex items-center gap-2 text-gray-600 hover:text-primary">
+                            <span id="userName" class="font-medium">User</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 glass rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                            <button onclick="logout()" class="w-full text-left px-4 py-3 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-xl">
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+        <!-- Welcome Section -->
+        <div class="mb-10 animate-fadeInUp">
+            <h1 class="font-heading text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                Welcome back, <span id="welcomeName" class="gradient-text">Student</span>!
+            </h1>
+            <p class="text-gray-600">Ready to continue your CPALE journey?</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div class="glass rounded-2xl p-5 animate-scaleIn stagger-1">
+                <p class="text-gray-500 text-sm mb-1">Questions Answered</p>
+                <p class="font-heading text-3xl font-bold text-gray-900" id="totalAnswered">0</p>
+            </div>
+            <div class="glass rounded-2xl p-5 animate-scaleIn stagger-2">
+                <p class="text-gray-500 text-sm mb-1">Correct Answers</p>
+                <p class="font-heading text-3xl font-bold text-secondary" id="correctAnswers">0</p>
+            </div>
+            <div class="glass rounded-2xl p-5 animate-scaleIn stagger-3">
+                <p class="text-gray-500 text-sm mb-1">Accuracy Rate</p>
+                <p class="font-heading text-3xl font-bold text-primary" id="accuracyRate">0%</p>
+            </div>
+            <div class="glass rounded-2xl p-5 animate-scaleIn stagger-4">
+                <p class="text-gray-500 text-sm mb-1">Questions Left</p>
+                <p class="font-heading text-3xl font-bold text-accent" id="questionsLeft">50</p>
+            </div>
+        </div>
+
+        <!-- Start Practice CTA -->
+        <div class="glass rounded-3xl p-8 mb-10 bg-gradient-to-r from-primary/5 to-accent/5 animate-fadeInUp" style="animation-delay: 0.3s; opacity: 0;">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2">Ready to Practice?</h2>
+                    <p class="text-gray-600">Jump into a quick practice session and test your knowledge.</p>
+                </div>
+                <a href="/landing-page/quiz.html" class="btn-glow animate-pulse-subtle bg-gradient-to-r from-primary to-purple-500 text-white px-8 py-4 rounded-xl font-bold text-lg whitespace-nowrap">
+                    Start Practice
+                </a>
+            </div>
+        </div>
+
+        <!-- Subjects Grid -->
+        <div class="mb-10">
+            <h2 class="font-heading text-2xl font-bold text-gray-900 mb-6">Choose a Subject</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="subjectsGrid">
+                <!-- Subjects will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Account Status -->
+        <div id="accountStatus" class="glass rounded-2xl p-6 border-2 border-dashed border-primary/30">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div id="planIcon" class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">🆓</span>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 id="planName" class="font-heading font-bold text-gray-900">FREE Account</h3>
+                        <span id="questionsRemainingBadge" class="bg-accent/10 text-accent text-xs font-bold px-2 py-0.5 rounded-full">50 left</span>
+                    </div>
+                    <p id="planDescription" class="text-gray-600 text-sm mb-3 md:mb-0">You have access to 50 FREE questions. Upgrade for more features!</p>
+                    
+                    <!-- Features List (shown for Basic/Advance) -->
+                    <div id="featuresList" class="mb-3 md:mb-0 hidden">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-secondary/10 text-secondary text-xs px-2 py-1 rounded-full">Basic Analytics</span>
+                            <span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">AI Assessment</span>
+                            <span class="bg-accent/10 text-accent text-xs px-2 py-1 rounded-full">Priority Support</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress bar for question limits -->
+                    <div class="md:hidden mt-2">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span id="progressLabel">Free Questions Used</span>
+                            <span id="freeProgressText">0/50</span>
+                        </div>
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div id="freeProgressBar" class="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button id="upgradeBtn" onclick="showUpgradeModal()" class="btn-glow bg-gradient-to-r from-secondary to-emerald-400 text-white px-6 py-3 rounded-xl font-bold whitespace-nowrap">
+                        Upgrade Now
+                    </button>
+                </div>
+            </div>
+        </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 class="font-heading font-bold text-gray-900">FREE Account</h3>
+                        <span id="questionsRemainingBadge" class="bg-accent/10 text-accent text-xs font-bold px-2 py-0.5 rounded-full">50 left</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3 md:mb-0">You have access to 50 FREE questions. Upgrade for 10,000+ questions!</p>
+                    <!-- Progress bar for free questions -->
+                    <div class="md:hidden mt-2">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Free Questions Used</span>
+                            <span id="freeProgressText">0/50</span>
+                        </div>
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div id="freeProgressBar" class="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="showUpgradeModal()" class="btn-glow bg-gradient-to-r from-secondary to-emerald-400 text-white px-6 py-3 rounded-xl font-bold whitespace-nowrap">
+                    Upgrade Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Tiered Upgrade Modal -->
+        <div id="upgradeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeUpgradeModal()"></div>
+            <div class="relative glass rounded-3xl p-8 max-w-4xl w-full shadow-2xl max-h-[80vh] overflow-y-auto">
+                <button onclick="closeUpgradeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+
+                <div class="text-center mb-8">
+                    <h3 class="font-heading text-3xl font-bold text-gray-900 mb-3">Choose Your Study Plan</h3>
+                    <p class="text-gray-600">Upgrade to unlock more questions and premium features</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <!-- FREE Plan -->
+                    <div class="glass rounded-2xl p-6 text-center border-2 border-gray-200">
+                        <h4 class="font-heading text-xl font-bold text-gray-900 mb-2">FREE</h4>
+                        <div class="text-3xl font-heading font-bold text-primary mb-2">₱0</div>
+                        <p class="text-gray-500 text-sm mb-4">Forever free</p>
+                        <ul class="text-left space-y-2 mb-4 text-sm">
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-secondary/20 rounded-full flex items-center justify-center text-secondary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">50 MCQs unlimited access</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 text-xs mt-0.5">✗</span>
+                                <span class="text-gray-400">Basic analytics</span>
+                            </li>
+                        </ul>
+                        <div class="text-xs text-gray-500 font-semibold px-3 py-2 bg-gray-100 rounded-xl">CURRENT PLAN</div>
+                    </div>
+
+                    <!-- BASIC Plan -->
+                    <div class="glass-dark rounded-2xl p-6 text-center border-2 border-secondary/30 relative hover:shadow-xl transition-all">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-secondary to-emerald-400 text-white text-xs font-bold px-3 py-1 rounded-full">
+                            POPULAR CHOICE
+                        </div>
+                        <h4 class="font-heading text-xl font-bold text-gray-900 mb-2">BASIC</h4>
+                        <div class="text-3xl font-heading font-bold text-secondary mb-2">₱149</div>
+                        <p class="text-gray-500 text-sm mb-4">per month</p>
+                        <ul class="text-left space-y-2 mb-4 text-sm">
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-secondary/20 rounded-full flex items-center justify-center text-secondary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">200 MCQs per subject</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-secondary/20 rounded-full flex items-center justify-center text-secondary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">50 practice sets per subject</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-secondary/20 rounded-full flex items-center justify-center text-secondary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">Basic analytics</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-secondary/20 rounded-full flex items-center justify-center text-secondary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">Email support</span>
+                            </li>
+                        </ul>
+                        <button onclick="selectPaymentPlan('BASIC')" class="w-full bg-gradient-to-r from-secondary to-emerald-400 text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all">
+                            Choose Basic
+                        </button>
+                    </div>
+
+                    <!-- ADVANCE Plan -->
+                    <div class="glass rounded-2xl p-6 text-center border-2 border-accent/30 relative hover:shadow-xl transition-all">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-primary to-accent text-white text-xs font-bold px-3 py-1 rounded-full">
+                            BEST VALUE
+                        </div>
+                        <h4 class="font-heading text-xl font-bold text-gray-900 mb-2">ADVANCE</h4>
+                        <div class="text-3xl font-heading font-bold text-primary mb-2">₱449</div>
+                        <p class="text-gray-500 text-sm mb-4">per month</p>
+                        <ul class="text-left space-y-2 mb-4 text-sm">
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center text-primary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">10,000+ MCQs for all subjects</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center text-primary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">AI-powered assessment</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center text-primary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">Advanced analytics</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center text-primary text-xs mt-0.5">✓</span>
+                                <span class="text-gray-700">Priority support</span>
+                            </li>
+                        </ul>
+                        <button onclick="selectPaymentPlan('ADVANCE')" class="w-full bg-gradient-to-r from-primary to-accent text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all">
+                            Choose Advance
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button onclick="closeUpgradeModal()" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+                        Maybe Later
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Modal (for when plan is selected) -->
+        <div id="paymentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closePaymentModal()"></div>
+            <div class="relative glass rounded-3xl p-8 max-w-md w-full shadow-2xl">
+                <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <span class="text-4xl">💳</span>
+                    </div>
+                    <h3 id="paymentPlanTitle" class="font-heading text-2xl font-bold text-gray-900 mb-3">Complete Your Plan</h3>
+                    <p class="text-gray-600 mb-6">Choose your payment method to activate your subscription</p>
+
+                    <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl p-6 mb-6">
+                        <div class="flex items-center justify-center gap-2 mb-2">
+                            <span id="paymentPrice" class="text-3xl font-heading font-bold text-primary">₱149</span>
+                            <span class="text-gray-500 text-lg">per month</span>
+                        </div>
+                        <p id="paymentFeatures" class="text-sm text-gray-600">Starting with premium features</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button onclick="processPaymentMethod('GCASH')" class="bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-all">
+                            <div class="text-2xl mb-1">💵</div>
+                            GCash
+                        </button>
+                        <button onclick="processPaymentMethod('MAYA')" class="bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition-all">
+                            <div class="text-2xl mb-1">💜</div>
+                            Maya
+                        </button>
+                    </div>
+
+                    <button onclick="processPaymentMethod('CARD')" class="w-full bg-gradient-to-r from-primary to-accent text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all">
+                        Pay with Credit/Debit Card
+                    </button>
+
+                    <div class="flex justify-between gap-3">
+                        <button onclick="closePaymentModal()" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+                            Back
+                        </button>
+                        <button onclick="processPaymentMethod('BANK')" class="flex-1 bg-gray-700 text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition-all">
+                            Bank Transfer
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Secure payment processing • 30-day money-back guarantee</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 mt-20">
+        <div class="max-w-7xl mx-auto px-6 py-8 text-center text-gray-500 text-sm">
+            &copy; 2026 CPALE Explained. Built with care for CPA students.
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        // Check authentication
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token) {
+            window.location.href = '/landing-page/login.html';
+        }
+
+        // Set user info
+        document.getElementById('userName').textContent = user.displayName || user.email || 'User';
+        document.getElementById('welcomeName').textContent = user.displayName || 'Student';
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/landing-page/login.html';
+        }
+
+        // Subject metadata
+        const subjectMeta = {
+            'FAR': { icon: '📊', color: 'from-blue-400 to-blue-600' },
+            'AFAR': { icon: '📈', color: 'from-purple-400 to-purple-600' },
+            'MS': { icon: '💼', color: 'from-green-400 to-green-600' },
+            'RFBT': { icon: '⚖️', color: 'from-orange-400 to-orange-600' },
+            'TAX': { icon: '🧾', color: 'from-red-400 to-red-600' },
+            'AUD': { icon: '🔍', color: 'from-cyan-400 to-cyan-600' }
+        };
+
+        // Load stats from API
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/api/progress/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Update overview stats
+                    document.getElementById('totalAnswered').textContent = data.overview.total_answered || 0;
+                    document.getElementById('correctAnswers').textContent = data.overview.total_correct || 0;
+                    document.getElementById('accuracyRate').textContent = (data.overview.accuracy_rate || 0) + '%';
+                    document.getElementById('questionsLeft').textContent = data.freeQuestionsRemaining || 50;
+
+                    // Update account status based on user tier
+                    updateAccountStatus(user);
+
+                    // Update free progress indicator
+                    updateFreeProgress(data.freeQuestionsRemaining || 50);
+
+                    // Render subjects with progress
+                    renderSubjects(data.bySubject);
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                // Fallback to static subjects
+                renderSubjects([]);
+            }
+        }
+
+        // Update account status display based on user tier
+        function updateAccountStatus(user) {
+            const planIcon = document.getElementById('planIcon');
+            const planName = document.getElementById('planName');
+            const planDescription = document.getElementById('planDescription');
+            const questionsRemainingBadge = document.getElementById('questionsRemainingBadge');
+            const upgradeBtn = document.getElementById('upgradeBtn');
+            const featuresList = document.getElementById('featuresList');
+            const progressLabel = document.getElementById('progressLabel');
+
+            const userTier = user.userType || 'FREE';
+
+            if (userTier === 'FREE') {
+                planIcon.innerHTML = '<span class="text-2xl">🆓</span>';
+                planIcon.className = 'w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0';
+                planName.textContent = 'FREE Account';
+                planDescription.textContent = 'You have access to 50 FREE questions. Upgrade for more features!';
+                questionsRemainingBadge.textContent = `${data.freeQuestionsRemaining || 50} left`;
+                questionsRemainingBadge.className = 'bg-accent/10 text-accent text-xs font-bold px-2 py-0.5 rounded-full';
+                upgradeBtn.textContent = 'Upgrade Now';
+                upgradeBtn.className = 'btn-glow bg-gradient-to-r from-secondary to-emerald-400 text-white px-6 py-3 rounded-xl font-bold whitespace-nowrap';
+                featuresList.classList.add('hidden');
+                progressLabel.textContent = 'Free Questions Used';
+            } else if (userTier === 'BASIC') {
+                planIcon.innerHTML = '<span class="text-2xl">⭐</span>';
+                planIcon.className = 'w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0';
+                planName.textContent = 'BASIC Plan';
+                planDescription.textContent = 'You have access to 200 MCQs per subject with basic analytics.';
+                questionsRemainingBadge.textContent = 'BASIC';
+                questionsRemainingBadge.className = 'bg-secondary/10 text-secondary text-xs font-bold px-2 py-0.5 rounded-full';
+                upgradeBtn.textContent = 'Upgrade to Advance';
+                upgradeBtn.className = 'btn-glow bg-gradient-to-r from-primary to-accent text-white px-6 py-3 rounded-xl font-bold whitespace-nowrap';
+                
+                // Show Basic features
+                featuresList.classList.remove('hidden');
+                featuresList.innerHTML = `
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-secondary/10 text-secondary text-xs px-2 py-1 rounded-full">200 MCQs/subject</span>
+                        <span class="bg-secondary/10 text-secondary text-xs px-2 py-1 rounded-full">Basic Analytics</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">Email Support</span>
+                    </div>
+                `;
+                progressLabel.textContent = 'Questions Used (200/subject)';
+            } else if (userTier === 'ADVANCE') {
+                planIcon.innerHTML = '<span class="text-2xl">🚀</span>';
+                planIcon.className = 'w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center flex-shrink-0 text-white';
+                planName.textContent = 'ADVANCE Plan';
+                planDescription.textContent = 'Unlimited access to 10,000+ MCQs with AI-powered features.';
+                questionsRemainingBadge.textContent = 'ADVANCE';
+                questionsRemainingBadge.className = 'bg-gradient-to-r from-primary to-accent text-white text-xs font-bold px-2 py-0.5 rounded-full';
+                upgradeBtn.classList.add('hidden');
+                
+                // Show Advance features
+                featuresList.classList.remove('hidden');
+                featuresList.innerHTML = `
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">Unlimited MCQs</span>
+                        <span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">AI Assessment</span>
+                        <span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">Advanced Analytics</span>
+                        <span class="bg-accent/10 text-accent text-xs px-2 py-1 rounded-full">Priority Support</span>
+                    </div>
+                `;
+                progressLabel.textContent = 'Questions Attempted';
+            }
+        }
+
+        function renderSubjects(subjectStats) {
+            const subjectsGrid = document.getElementById('subjectsGrid');
+            subjectsGrid.innerHTML = '';
+
+            const subjectData = subjectStats.length > 0 ? subjectStats : [
+                { subject_code: 'FAR', subject_name: 'Financial Accounting and Reporting', attempted: 0, accuracy: 0 },
+                { subject_code: 'AFAR', subject_name: 'Advanced Financial Accounting and Reporting', attempted: 0, accuracy: 0 },
+                { subject_code: 'MS', subject_name: 'Management Services', attempted: 0, accuracy: 0 },
+                { subject_code: 'RFBT', subject_name: 'Regulatory Framework for Business Transactions', attempted: 0, accuracy: 0 },
+                { subject_code: 'TAX', subject_name: 'Taxation', attempted: 0, accuracy: 0 },
+                { subject_code: 'AUD', subject_name: 'Auditing', attempted: 0, accuracy: 0 }
+            ];
+
+            subjectData.forEach((subject, index) => {
+                const meta = subjectMeta[subject.subject_code] || { icon: '📚', color: 'from-gray-400 to-gray-600' };
+                const progressWidth = Math.min(subject.accuracy || 0, 100);
+                const delay = 0.1 * (index + 1);
+
+                subjectsGrid.innerHTML += `
+                    <a href="/landing-page/quiz.html?subject=${subject.subject_code}" class="subject-card glass rounded-2xl p-6 block hover:shadow-lg transition-all animate-fadeInUp" style="animation-delay: ${delay}s; opacity: 0;">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-14 h-14 bg-gradient-to-br ${meta.color} rounded-xl flex items-center justify-center text-2xl shadow-lg">
+                                ${meta.icon}
+                            </div>
+                            <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">${subject.subject_code}</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-gray-900 mb-2">${subject.subject_name}</h3>
+                        <div class="mb-3">
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>${subject.attempted || 0} answered</span>
+                                <span>${subject.accuracy || 0}%</span>
+                            </div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r ${meta.color} rounded-full transition-all duration-500" style="width: ${progressWidth}%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-primary text-sm font-medium">
+                            ${subject.attempted > 0 ? 'Continue practicing' : 'Start practicing'}
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </a>
+                `;
+            });
+        }
+
+        // Update free questions progress
+        function updateFreeProgress(remaining) {
+            const used = 50 - remaining;
+            const percentage = (used / 50) * 100;
+
+            document.getElementById('questionsRemainingBadge').textContent = `${remaining} left`;
+            document.getElementById('freeProgressText').textContent = `${used}/50`;
+            document.getElementById('freeProgressBar').style.width = `${percentage}%`;
+
+            // Change color if running low
+            if (remaining <= 10) {
+                document.getElementById('questionsRemainingBadge').className = 'bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full';
+            } else if (remaining <= 25) {
+                document.getElementById('questionsRemainingBadge').className = 'bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full';
+            }
+        }
+
+        // Show upgrade modal
+        function showUpgradeModal() {
+            document.getElementById('upgradeModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close upgrade modal
+        function closeUpgradeModal() {
+            document.getElementById('upgradeModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Process upgrade
+        function processUpgrade() {
+            showUpgradeModal();
+        }
+
+        // Select payment plan from upgrade modal
+        function selectPaymentPlan(plan) {
+            const planDetails = {
+                'BASIC': {
+                    price: '₱149',
+                    period: 'per month',
+                    features: ['200 MCQs per subject', '50 practice sets per subject', 'Basic analytics', 'Email support']
+                },
+                'ADVANCE': {
+                    price: '₱449',
+                    period: 'per month',
+                    features: ['10,000+ MCQs for all subjects', 'AI-powered assessment', 'Advanced analytics', 'Priority support']
+                }
+            };
+
+            const details = planDetails[plan];
+            if (!details) return;
+
+            // Close upgrade modal and show payment modal
+            closeUpgradeModal();
+            
+            // Update payment modal content
+            document.getElementById('paymentPlanTitle').textContent = `Complete Your ${plan} Plan`;
+            document.getElementById('paymentPrice').textContent = details.price;
+            document.getElementById('paymentFeatures').textContent = `Starting with ${plan.toLowerCase()} features: ${details.features.slice(0, 2).join(', ')}...`;
+            
+            // Show payment modal
+            document.getElementById('paymentModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // Store selected plan globally
+            window.selectedPlan = plan;
+        }
+
+        // Close upgrade modal
+        function closeUpgradeModal() {
+            document.getElementById('upgradeModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Show payment modal
+        function showPaymentModal() {
+            document.getElementById('paymentModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close payment modal
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Process payment method
+        function processPaymentMethod(method) {
+            const plan = window.selectedPlan || 'ADVANCE'; // Default to ADVANCE if not set
+            const userDetails = {
+                email: user.email,
+                userId: user.userId,
+                plan: plan,
+                paymentMethod: method
+            };
+
+            // TODO: Integrate with actual payment gateway
+            alert(`Payment integration coming soon!\n\nPlan: ${plan}\nMethod: ${method}\nEmail: ${userDetails.email}\n\nContact us for early access at cpale.explained@gmail.com`);
+            
+            // For development, simulate successful payment
+            console.log('Processing payment:', userDetails);
+            
+            // You can uncomment this to simulate successful upgrade
+            /*
+            if (confirm('Simulate successful payment for testing?')) {
+                // Simulate payment success
+                location.reload();
+            }
+            */
+        }
+
+        // Initialize
+        loadStats();
+    </script>
+</body>
+</html>
